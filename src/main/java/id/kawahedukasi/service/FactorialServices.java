@@ -6,10 +6,7 @@ import io.vertx.core.json.JsonObject;
 import javax.enterprise.context.ApplicationScoped;
 import javax.transaction.Transactional;
 import javax.validation.ValidationException;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 @ApplicationScoped
 public class FactorialServices {
@@ -17,12 +14,12 @@ public class FactorialServices {
   @Transactional
   public Map<String, Object> generateFactorial(JsonObject request) {
     Integer n = request.getInteger("n");
-    Integer factorial = factorialRecursive(n);
 
     if (n == null || n < 0) {
       throw new ValidationException("BAD_REQUEST: n must be a non-negative integer.");
     }
 
+    Integer factorial = factorialRecursive(n);
     Factorial factorial1 = new Factorial();
     factorial1.setN(n);
     factorial1.setFactorial(factorial);
@@ -42,6 +39,8 @@ public class FactorialServices {
     List<Factorial> factorial = Factorial.listAll();
     List<Map<String, Object>> result = new ArrayList<>();
 
+    factorial.sort(Comparator.comparing(Factorial::getN));
+
     for (Factorial item : factorial) {
       Map<String, Object> map = new HashMap<>();
       map.put("n", item.getN());
@@ -49,6 +48,7 @@ public class FactorialServices {
 
       result.add(map);
     }
+
     return result;
   }
 }

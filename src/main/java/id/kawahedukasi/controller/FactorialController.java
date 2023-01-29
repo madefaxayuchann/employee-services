@@ -4,6 +4,7 @@ import id.kawahedukasi.service.FactorialServices;
 import io.vertx.core.json.JsonObject;
 
 import javax.inject.Inject;
+import javax.validation.ValidationException;
 import javax.ws.rs.*;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
@@ -21,10 +22,16 @@ public class FactorialController {
 
   @POST
   public Response create(JsonObject request) {
-    Map<String, Object> data = factorialServices.generateFactorial(request);
-    Map<String, Object> result = new HashMap<>();
-    result.put("data", data);
-    return Response.status(Response.Status.CREATED).entity(result).build();
+    try {
+      Map<String, Object> data = factorialServices.generateFactorial(request);
+      Map<String, Object> result = new HashMap<>();
+      result.put("data", data);
+      return Response.ok().entity(result).build();
+    } catch (ValidationException e) {
+      Map<String, Object> result = new HashMap<>();
+      result.put("message", e.getMessage());
+      return Response.status(Response.Status.BAD_REQUEST).entity(result).build();
+    }
   }
 
   @GET
