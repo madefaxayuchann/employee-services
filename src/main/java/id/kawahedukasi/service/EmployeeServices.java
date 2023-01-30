@@ -4,11 +4,8 @@ import id.kawahedukasi.models.Employee;
 import io.vertx.core.json.JsonObject;
 
 import javax.enterprise.context.ApplicationScoped;
-import javax.persistence.EntityManager;
-import javax.persistence.PersistenceContext;
 import javax.transaction.Transactional;
 import javax.validation.ValidationException;
-import java.util.List;
 import java.util.Map;
 
 @ApplicationScoped
@@ -34,8 +31,21 @@ public class EmployeeServices {
     employee.setManager_id(manager_id);
     employee.persist();
 
+
     return employee;
   }
+
+  public String query = "with recursive subordinates as ("
+          + "select e.id, e.name, e.manager_id "
+          + "from internship.employee e "
+          + "where e.id = :id "
+          + "union "
+          + "select es.id, es.name, e.manager_id "
+          + "from internship.employee_score es "
+          + "inner join internship.employee e on es.employee_id = e.id "
+          + "inner join subordinates s on s.id = e.manager_id "
+          + ") "
+          + "select * from subordinates;";
 
 
 

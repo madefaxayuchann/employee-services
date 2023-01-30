@@ -7,10 +7,12 @@ import io.vertx.core.json.JsonObject;
 
 import javax.inject.Inject;
 import javax.persistence.EntityManager;
+import javax.persistence.Query;
 import javax.validation.ValidationException;
 import javax.ws.rs.*;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -22,6 +24,9 @@ public class EmployeeController {
 
   @Inject
   EmployeeServices employeeServices;
+
+  @Inject
+  EntityManager em;
 
 
 
@@ -36,6 +41,30 @@ public class EmployeeController {
       result.put("message", e.getMessage());
       return Response.status(Response.Status.BAD_REQUEST).entity(result).build();
     }
+  }
+
+  @GET
+  @Path("/{id}")
+  public List<Map<String, Object>> getSubordinates(@PathParam("id") Integer id) {
+    System.out.println(id);
+    Query query = em.createNativeQuery(employeeServices.query, Employee.class);
+    query.setParameter("id", id);
+
+    List<Map<String, Object>> data = new ArrayList<>();
+
+
+    List<Employee> results = query.getResultList();
+    for (Employee result : results) {
+      Map<String, Object> subordinate = new HashMap<>();
+      subordinate.put("id", result.getId());
+      subordinate.put("name", result.getName());
+      subordinate.put("manger_id", result.getManager_id());
+
+      data.add(subordinate);
+
+    }
+
+    return data;
   }
 
 }
