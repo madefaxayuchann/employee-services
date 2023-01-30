@@ -11,7 +11,7 @@ import java.util.*;
 @ApplicationScoped
 public class FactorialServices {
 
-  @Transactional
+   @Transactional
   public Map<String, Object> generateFactorial(JsonObject request) {
     Integer n = request.getInteger("n");
 

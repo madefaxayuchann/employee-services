@@ -1,9 +1,12 @@
 package id.kawahedukasi.controller;
 
-import id.kawahedukasi.service.FactorialServices;
+
+import id.kawahedukasi.models.Employee;
+import id.kawahedukasi.service.EmployeeServices;
 import io.vertx.core.json.JsonObject;
 
 import javax.inject.Inject;
+import javax.persistence.EntityManager;
 import javax.validation.ValidationException;
 import javax.ws.rs.*;
 import javax.ws.rs.core.MediaType;
@@ -12,19 +15,21 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-@Path("/factorial")
+@Path("/employee")
 @Produces(MediaType.APPLICATION_JSON)
 @Consumes(MediaType.APPLICATION_JSON)
-public class FactorialController {
+public class EmployeeController {
 
   @Inject
-  FactorialServices factorialServices;
+  EmployeeServices employeeServices;
+
+
 
   @POST
   public Response create(JsonObject request) {
     Map<String, Object> result = new HashMap<>();
     try {
-      Map<String, Object> data = factorialServices.generateFactorial(request);
+      Map<String, Object> data = employeeServices.create(request);
       result.put("data", data);
       return Response.ok().entity(result).build();
     } catch (ValidationException e) {
@@ -32,14 +37,5 @@ public class FactorialController {
       return Response.status(Response.Status.BAD_REQUEST).entity(result).build();
     }
   }
-
-  @GET
-  public Response list() {
-    List<Map<String, Object>> factorial = factorialServices.getAll();
-    Map<String, Object> result = new HashMap<>();
-    result.put("data", factorial);
-    return Response.ok().entity(result).build();
-  }
-
 
 }
