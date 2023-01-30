@@ -25,11 +25,6 @@ public class EmployeeController {
   @Inject
   EmployeeServices employeeServices;
 
-  @Inject
-  EntityManager em;
-
-
-
   @POST
   public Response create(JsonObject request) {
     Map<String, Object> result = new HashMap<>();
@@ -44,27 +39,18 @@ public class EmployeeController {
   }
 
   @GET
-  @Path("/{id}")
-  public List<Map<String, Object>> getSubordinates(@PathParam("id") Integer id) {
-    System.out.println(id);
-    Query query = em.createNativeQuery(employeeServices.query, Employee.class);
-    query.setParameter("id", id);
-
-    List<Map<String, Object>> data = new ArrayList<>();
-
-
-    List<Employee> results = query.getResultList();
-    for (Employee result : results) {
-      Map<String, Object> subordinate = new HashMap<>();
-      subordinate.put("id", result.getId());
-      subordinate.put("name", result.getName());
-      subordinate.put("manger_id", result.getManager_id());
-
-      data.add(subordinate);
+  @Path("/id/{id}")
+  public Response getById(@PathParam("id") Integer id) {
+    try {
+      List<Map<String, Object>> result = employeeServices.getSubordinates(id);
+      return Response.ok().entity(result).build();
+    } catch (ValidationException e) {
+      Map<String, Object> result = new HashMap<>();
+      result.put("message", e.getMessage());
+      return Response.status(Response.Status.BAD_REQUEST).entity(result).build();
 
     }
-
-    return data;
   }
+
 
 }
