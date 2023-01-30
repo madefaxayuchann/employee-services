@@ -29,21 +29,6 @@ public class EmployeeServices {
           + ") "
           + "select * from subordinates;";
 
-
-  public String avgScoreQuery = "with recursive subordinates as ( " +
-          "select e.id, e.name, e.manager_id, es.score " +
-          "from internship.employee e " +
-          "join internship.employee_score es on e.id = es.employee_id " +
-          "where e.id = :id " +
-          "union " +
-          "select e.id, e.name, e.manager_id, es.score " +
-          "from internship.employee e " +
-          "join internship.employee_score es on e.id = es.employee_id " +
-          "join subordinates s on e.manager_id = s.id " +
-          ") " +
-          "select AVG(score) as overall_average_score " +
-          "from subordinates;";
-
   @Inject
   EntityManager em;
 
@@ -72,8 +57,6 @@ public class EmployeeServices {
   }
 
   public List<Map<String, Object>> getSubordinates(Integer id) {
-
-    System.out.println(id + "liken ayu");
 
     Employee employee = em.find(Employee.class, id);
     if (employee == null) {
